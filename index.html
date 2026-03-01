@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAGUSD Prop Dashboard</title>
+</head>
+<body>
+
+<h2>XAGUSD Prop Dashboard</h2>
+
+<h3>Live Price: <span id="price">Loading...</span></h3>
+
+<h3>Add Trade</h3>
+<input id="direction" placeholder="buy or sell"><br>
+<input id="entry" placeholder="Entry"><br>
+<input id="sl" placeholder="SL"><br>
+<input id="tp" placeholder="TP"><br>
+<input id="result" placeholder="Result ($)"><br>
+<button onclick="addTrade()">Add</button>
+
+<h3>Analytics</h3>
+<pre id="analytics"></pre>
+
+<script>
+
+const API="https://YOUR-RENDER-URL";
+
+async function loadPrice(){
+let res=await fetch(API+"/api/price");
+let data=await res.json();
+document.getElementById("price").innerText=data.price;
+}
+setInterval(loadPrice,10000);
+loadPrice();
+
+async function addTrade(){
+let trade={
+direction:direction.value,
+entry:Number(entry.value),
+sl:Number(sl.value),
+tp:Number(tp.value),
+rr:2,
+result:Number(result.value)
+};
+
+await fetch(API+"/api/trades",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(trade)
+});
+
+loadAnalytics();
+}
+
+async function loadAnalytics(){
+let res=await fetch(API+"/api/analytics");
+let data=await res.json();
+document.getElementById("analytics").innerText=
+JSON.stringify(data,null,2);
+}
+loadAnalytics();
+
+</script>
+</body>
+</html>
